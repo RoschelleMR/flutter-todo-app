@@ -1,6 +1,7 @@
 import 'package:basic/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 class AddPage extends StatefulWidget {
   const AddPage({super.key});
@@ -10,63 +11,215 @@ class AddPage extends StatefulWidget {
 }
 
 class _AddPageState extends State<AddPage> {
+  final formKey = GlobalKey<FormState>();
+  TextEditingController date = TextEditingController();
+
+  int selected = 0;
+
+  Widget CustomRadioButton(String btnText, int index, int color) {
+    return OutlinedButton(
+      onPressed: () {
+        setState(() {
+          selected = index;
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          btnText,
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
+          ),
+        ),
+      ),
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(Color(color)),
+        shape: MaterialStateProperty.all(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(7),
+          ),
+        ),
+        side: MaterialStateProperty.all(
+          BorderSide(
+            color: (selected == index)
+              ?Colors.blue.shade300
+              : Colors.transparent,
+            width: 4,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       backgroundColor: Color(0xff00C969),
-
       appBar: _appBarSection(context),
-
       body: Column(
         children: [
           _headerText(),
           SizedBox(
             height: 20,
           ),
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(40),
+                    topRight: Radius.circular(40))),
+            child: Padding(
+              padding: const EdgeInsets.all(30),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Enter Task';
+                        } else {
+                          return null;
+                        }
+                      },
+                      decoration: InputDecoration(
+                        enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                          width: 2.5,
+                          color: Colors.black,
+                        )),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            width: 1.5,
+                            color: Color.fromARGB(255, 0, 170, 255),
+                          ),
+                        ),
+                        labelText: 'Add Task',
+                        labelStyle: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                        hintText: 'Eg. Learn Flutter',
+                      ),
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    TextFormField(
+                        controller: date,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Enter Date';
+                          } else {
+                            return null;
+                          }
+                        },
+                        decoration: InputDecoration(
+                          suffixIcon: Icon(Icons.calendar_month, size: 35),
+                          enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                            width: 2.5,
+                            color: Colors.black,
+                          )),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              width: 2,
+                              color: Color.fromARGB(255, 0, 170, 255),
+                            ),
+                          ),
+                          labelText: 'Date',
+                          labelStyle: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                          hintText: 'Eg. June 17, 2023',
+                        ),
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(3000));
+
+                          if (pickedDate != null) {
+                            date.text =
+                                DateFormat.yMMMMd('en_US').format(pickedDate);
+                          }
+                        }),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Text(
+                      'Priorty',
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CustomRadioButton('High', 0, 0xffE00000),
+                        CustomRadioButton('Medium', 1, 0xffFFB800),
+                        CustomRadioButton('Low', 2, 0xff04E000),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-
   Container _headerText() {
     return Container(
-          width: double.infinity,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: Color(0xff00C969),
+      width: double.infinity,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Color(0xff00C969),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Text(
+          'TaskPal',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 48,
+            fontWeight: FontWeight.bold,
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Text(
-              'TaskPal',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 48,
-                fontWeight: FontWeight.bold, 
-              ),
-            ),
-          ),
-        );
+        ),
+      ),
+    );
   }
-
-
 
   AppBar _appBarSection(BuildContext context) {
     return AppBar(
-       backgroundColor: Color(0xff00C969),
-       elevation: 0,
-       leading: GestureDetector(
-          onTap: (){
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext context) => 
-                const HomePage(),
-              ),
-            );
-          },
-         child: Container(
+      backgroundColor: Color(0xff00C969),
+      elevation: 0,
+      leading: GestureDetector(
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (BuildContext context) => const HomePage(),
+            ),
+          );
+        },
+        child: Container(
           margin: EdgeInsets.all(8),
           alignment: Alignment.center,
           decoration: BoxDecoration(
@@ -80,8 +233,8 @@ class _AddPageState extends State<AddPage> {
             height: 26,
             fit: BoxFit.scaleDown,
           ),
-         ),
-       ),
+        ),
+      ),
     );
   }
 }
