@@ -15,25 +15,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xff242424),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Color(0xff00C969),
-        foregroundColor: Colors.white,
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (BuildContext context) => 
-              const AddPage(),
-            ),
-          );
-        },
-        child: SvgPicture.asset(
-          'assets/icons/plus-solid.svg',
-          colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
-          width: 25,
-        ),
-      ),
+      floatingActionButton: floatingButton(),
       appBar: appBarSection(),
-      body: Column(children: [
+      body: Column(
+        children: [
         Padding(
           padding: const EdgeInsets.only(top: 16.0, left: 12, bottom: 12),
           child: Text(
@@ -53,6 +38,7 @@ class _HomePageState extends State<HomePage> {
       elevation: 0,
       toolbarHeight: 75,
       centerTitle: true,
+      automaticallyImplyLeading: false,
       title: Text(
         'TaskPal',
         style: TextStyle(
@@ -62,5 +48,25 @@ class _HomePageState extends State<HomePage> {
       ),
       backgroundColor: Color(0xff00C969),
     );
+  }
+
+  FloatingActionButton floatingButton(){
+    return FloatingActionButton(
+        backgroundColor: Color(0xff00C969),
+        foregroundColor: Colors.white,
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (BuildContext context) => 
+              const AddPage(),
+            ),
+          );
+        },
+        child: SvgPicture.asset(
+          'assets/icons/plus-solid.svg',
+          colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          width: 25,
+        ),
+      );
   }
 }
