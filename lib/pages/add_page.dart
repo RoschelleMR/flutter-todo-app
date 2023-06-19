@@ -12,7 +12,8 @@ class AddPage extends StatefulWidget {
 
 class _AddPageState extends State<AddPage> {
   final formKey = GlobalKey<FormState>();
-  TextEditingController date = TextEditingController();
+  TextEditingController date_controller = TextEditingController();
+  TextEditingController taskName_controller = TextEditingController();
 
   int selected = 0;
 
@@ -64,64 +65,32 @@ class _AddPageState extends State<AddPage> {
           SizedBox(
             height: 20,
           ),
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40))),
-            child: Padding(
-              padding: const EdgeInsets.all(30),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextFormField(
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Enter Task';
-                        } else {
-                          return null;
-                        }
-                      },
-                      decoration: InputDecoration(
-                        enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                          width: 2.5,
-                          color: Colors.black,
-                        )),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 1.5,
-                            color: Color.fromARGB(255, 0, 170, 255),
-                          ),
-                        ),
-                        labelText: 'Add Task',
-                        labelStyle: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                        hintText: 'Eg. Learn Flutter',
-                      ),
-                    ),
-                    SizedBox(
-                      height: 30,
-                    ),
-                    TextFormField(
-                        controller: date,
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40))),
+              child: Padding(
+                padding: const EdgeInsets.all(30),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextFormField(
+                        controller: taskName_controller,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Enter Date';
+                            return 'Enter Task';
                           } else {
                             return null;
                           }
                         },
                         decoration: InputDecoration(
-                          suffixIcon: Icon(Icons.calendar_month, size: 35),
                           enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(
                             width: 2.5,
@@ -129,54 +98,126 @@ class _AddPageState extends State<AddPage> {
                           )),
                           focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                              width: 2,
+                              width: 1.5,
                               color: Color.fromARGB(255, 0, 170, 255),
                             ),
                           ),
-                          labelText: 'Date',
+                          labelText: 'Add Task',
                           labelStyle: TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.w600,
                             color: Colors.black,
                           ),
-                          hintText: 'Eg. June 17, 2023',
+                          hintText: 'Eg. Learn Flutter',
                         ),
-                        onTap: () async {
-                          DateTime? pickedDate = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime(3000));
-
-                          if (pickedDate != null) {
-                            date.text =
-                                DateFormat.yMMMMd('en_US').format(pickedDate);
-                          }
-                        }),
-                    SizedBox(
-                      height: 30,
-                    ),
-                    Text(
-                      'Priorty',
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
                       ),
-                    ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        CustomRadioButton('High', 0, 0xffE00000),
-                        CustomRadioButton('Medium', 1, 0xffFFB800),
-                        CustomRadioButton('Low', 2, 0xff04E000),
-                      ],
-                    ),
-                  ],
+                      // SizedBox(
+                      //   height: 30,
+                      // ),
+                      TextFormField(
+                          controller: date_controller,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Enter Date';
+                            } else {
+                              return null;
+                            }
+                          },
+                          decoration: InputDecoration(
+                            suffixIcon: Icon(Icons.calendar_month, size: 35),
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                              width: 2.5,
+                              color: Colors.black,
+                            )),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                width: 2,
+                                color: Color.fromARGB(255, 0, 170, 255),
+                              ),
+                            ),
+                            labelText: 'Date',
+                            labelStyle: TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                            hintText: 'Eg. June 17, 2023',
+                          ),
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime(3000));
+          
+                            if (pickedDate != null) {
+                              date_controller.text =
+                                  DateFormat.yMMMMd('en_US').format(pickedDate);
+                            }
+                          }),
+                      // SizedBox(
+                      //   height: 30,
+                      // ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Priorty',
+                            style: TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              CustomRadioButton('High', 0, 0xffE00000),
+                              CustomRadioButton('Medium', 1, 0xffFFB800),
+                              CustomRadioButton('Low', 2, 0xff04E000),
+                            ],
+                          ),
+                        ],
+                      ),
+                      // for save button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: (){}, 
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                top: 10,
+                                bottom: 10,
+                                left: 50,
+                                right: 50,),
+                              child: Text(
+                                'Save',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(Color(0xff00C969)),
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(280),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
