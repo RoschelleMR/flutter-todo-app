@@ -45,10 +45,17 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> updateStatus(id) async {
+    var item = _tasksBox.get(id);
+    item['completedStatus'] = !item['completedStatus'];
+
+    _tasksBox.putAt(id, item);
+
+    refreshTasks();
+  }
+
   @override
   Widget build(BuildContext context) {
-    print(_tasksBox.get(0).toString());
-
     refreshTasks();
 
     return Scaffold(
@@ -90,48 +97,57 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item['name'],
-                              style: TextStyle(
-                                fontSize: 22,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
+                        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 1, right: 1),
+                        child: CheckboxListTile(
+                          controlAffinity: ListTileControlAffinity.trailing,
+                          value: item['completedStatus'],
+                          onChanged: (value) {
+                            updateStatus(item['id']);
+                          },
+                          checkColor: Colors.white,
+                          activeColor: Color(0xff00C969),
+                          title: Text(
+                            item['name'],
+                            style: TextStyle(
+                              fontSize: 22,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
                             ),
-                            Text(
-                              item['date'],
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Color.fromRGBO(0, 201, 104, 0.981),
-                                fontWeight: FontWeight.w600,
+                          ),
+                          subtitle: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item['date'],
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color.fromRGBO(0, 201, 104, 0.981),
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Color(item['priorityColor']),
-                                borderRadius: BorderRadius.circular(4),
+                              SizedBox(
+                                height: 5,
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 2.0, bottom: 2, right: 5, left: 5),
-                                child: Text(
-                                  item['category'],
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Color(item['priorityColor']),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 2.0, bottom: 2, right: 5, left: 5),
+                                  child: Text(
+                                    item['category'],
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -139,7 +155,7 @@ class _HomePageState extends State<HomePage> {
                 },
                 //this is temporary, need to add an intro to the app
                 // that says 'Create a task' or something like that
-              )
+              ),
             ]),
       ),
     );
