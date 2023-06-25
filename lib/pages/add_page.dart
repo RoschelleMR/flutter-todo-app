@@ -1,6 +1,7 @@
 import 'package:basic/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 
 class AddPage extends StatefulWidget {
@@ -11,17 +12,45 @@ class AddPage extends StatefulWidget {
 }
 
 class _AddPageState extends State<AddPage> {
+  //box to store tasks
+  final _tasksBox = Hive.box('myTasks');
+
   final formKey = GlobalKey<FormState>();
   TextEditingController date_controller = TextEditingController();
   TextEditingController taskName_controller = TextEditingController();
 
-  int selected = 0;
+
+  // default selected priority
+  int prioritySelected = 0;
+  String priorityName = 'High';
+  int priorityColor = 0xffE00000;
+
+  Future<void> createTask(Map<String, dynamic> newItem) async {
+    await _tasksBox.add(newItem);
+  }
+
+  void saveTask() {
+    createTask({
+      'taskName': taskName_controller.text,
+      'date': date_controller.text,
+      'priorityColor': priorityColor,
+      'category': priorityName,
+      'completedStatus': false,
+    });
+
+    taskName_controller.clear();
+    date_controller.clear();
+  }
+
+  
 
   Widget CustomRadioButton(String btnText, int index, int color) {
     return OutlinedButton(
       onPressed: () {
         setState(() {
-          selected = index;
+          prioritySelected = index;
+          priorityName = btnText;
+          priorityColor = color;
         });
       },
       child: Padding(
@@ -44,9 +73,9 @@ class _AddPageState extends State<AddPage> {
         ),
         side: MaterialStateProperty.all(
           BorderSide(
-            color: (selected == index)
-              ?Colors.blue.shade300
-              : Colors.transparent,
+            color: (prioritySelected == index)
+                ? Colors.blue.shade300
+                : Colors.transparent,
             width: 4,
           ),
         ),
@@ -57,6 +86,7 @@ class _AddPageState extends State<AddPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xff00C969),
       appBar: _appBarSection(context),
       body: Column(
@@ -150,10 +180,11 @@ class _AddPageState extends State<AddPage> {
                                 initialDate: DateTime.now(),
                                 firstDate: DateTime(2000),
                                 lastDate: DateTime(3000));
-          
+
                             if (pickedDate != null) {
                               date_controller.text =
-                                  DateFormat.yMMMMd('en_US').format(pickedDate);
+                                  DateFormat.yMMMMEEEEd('en_US')
+                                      .format(pickedDate);
                             }
                           }),
                       // SizedBox(
@@ -190,13 +221,30 @@ class _AddPageState extends State<AddPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ElevatedButton(
-                            onPressed: (){}, 
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                saveTask();
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      backgroundColor: Color(0xff00C969),
+                                      content: Text(
+                                        'Task Added',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500),
+                                      )
+                                    ),
+                                );
+                              }
+                            },
                             child: Padding(
                               padding: const EdgeInsets.only(
                                 top: 10,
                                 bottom: 10,
                                 left: 50,
-                                right: 50,),
+                                right: 50,
+                              ),
                               child: Text(
                                 'Save',
                                 style: TextStyle(
@@ -206,7 +254,8 @@ class _AddPageState extends State<AddPage> {
                               ),
                             ),
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(Color(0xff00C969)),
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Color(0xff00C969)),
                               shape: MaterialStateProperty.all(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(280),
