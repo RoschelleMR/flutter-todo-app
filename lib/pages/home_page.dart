@@ -54,6 +54,12 @@ class _HomePageState extends State<HomePage> {
     refreshTasks();
   }
 
+  Future<void> deleteTask(id) async {
+    _tasksBox.delete(id);
+
+    refreshTasks();
+  }
+
   @override
   Widget build(BuildContext context) {
     refreshTasks();
@@ -96,62 +102,91 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 10, bottom: 10, right: 8),
+                      padding:
+                          const EdgeInsets.only(top: 10, bottom: 10, right: 8),
                       child: Row(
                         children: [
                           PopupMenuButton(
+                            iconSize: 32,
                             color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(8.0),
+                                bottomRight: Radius.circular(8.0),
+                                topLeft: Radius.circular(8.0),
+                                topRight: Radius.circular(8.0),
+                              ),
+                            ),
                             itemBuilder: (context) => [
                               PopupMenuItem(
-                                child: Text('Delete'),
-                              )
-                            ],  
+                                child: Text(
+                                  'Delete',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                onTap: () {
+                                  deleteTask(item['id']);
+                                },
+                              ),
+                              PopupMenuItem(
+                                child: Text(
+                                  'Edit',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                onTap: () {
+                                  // editTask(item['id']);
+                                },
+                              ),
+                            ],
                           ),
                           Expanded(
-                            flex: 1,
                             child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item['name'],
-                                    style: TextStyle(
-                                      fontSize: 21,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item['name'],
+                                  style: TextStyle(
+                                    fontSize: 21,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                  
-                                  Text(
-                                    item['date'],
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Color.fromRGBO(0, 201, 104, 0.981),
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                ),
+                                Text(
+                                  item['date'],
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Color.fromRGBO(0, 201, 104, 0.981),
+                                    fontWeight: FontWeight.w600,
                                   ),
-                                  SizedBox(
-                                    height: 5,
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Color(item['priorityColor']),
+                                    borderRadius: BorderRadius.circular(4),
                                   ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: Color(item['priorityColor']),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 2.0, bottom: 2, right: 5, left: 5),
-                                      child: Text(
-                                        item['category'],
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 2.0, bottom: 2, right: 5, left: 5),
+                                    child: Text(
+                                      item['category'],
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
+                            ),
                           ),
                           Checkbox(
                             checkColor: Colors.white,
@@ -161,11 +196,6 @@ class _HomePageState extends State<HomePage> {
                               updateStatus(item['id']);
                             },
                           ),
-                    
-
-                            
-                            
-                
                         ],
                       ),
                     ),
