@@ -88,67 +88,85 @@ class _HomePageState extends State<HomePage> {
                 itemBuilder: (context, index) {
                   final item = tasks_list[index];
 
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(20, 20, 20, 0.83),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 1, right: 1),
-                        child: CheckboxListTile(
-                          controlAffinity: ListTileControlAffinity.trailing,
-                          value: item['completedStatus'],
-                          onChanged: (value) {
-                            updateStatus(item['id']);
-                          },
-                          checkColor: Colors.white,
-                          activeColor: Color(0xff00C969),
-                          title: Text(
-                            item['name'],
-                            style: TextStyle(
-                              fontSize: 22,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
+                  return Container(
+                    margin: EdgeInsets.all(5),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(20, 20, 20, 0.83),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10, bottom: 10, right: 8),
+                      child: Row(
+                        children: [
+                          PopupMenuButton(
+                            color: Colors.white,
+                            itemBuilder: (context) => [
+                              PopupMenuItem(
+                                child: Text('Delete'),
+                              )
+                            ],  
                           ),
-                          subtitle: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item['date'],
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Color.fromRGBO(0, 201, 104, 0.981),
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Color(item['priorityColor']),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 2.0, bottom: 2, right: 5, left: 5),
-                                  child: Text(
-                                    item['category'],
+                          Expanded(
+                            flex: 1,
+                            child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item['name'],
                                     style: TextStyle(
+                                      fontSize: 21,
                                       color: Colors.white,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                ),
+                                  
+                                  Text(
+                                    item['date'],
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Color.fromRGBO(0, 201, 104, 0.981),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Color(item['priorityColor']),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 2.0, bottom: 2, right: 5, left: 5),
+                                      child: Text(
+                                        item['category'],
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
                           ),
-                        ),
+                          Checkbox(
+                            checkColor: Colors.white,
+                            activeColor: Color(0xff00C969),
+                            value: item['completedStatus'],
+                            onChanged: (value) {
+                              updateStatus(item['id']);
+                            },
+                          ),
+                    
+
+                            
+                            
+                
+                        ],
                       ),
                     ),
                   );
