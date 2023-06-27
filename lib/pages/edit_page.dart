@@ -15,12 +15,20 @@ class EditPage extends StatefulWidget {
 }
 
 class _EditPageState extends State<EditPage> {
+
+  late final TextEditingController taskName_controller;
+
+  @override
+  void initState() {
+    super.initState();
+    taskName_controller = TextEditingController(text: widget.initialTask['taskName']);
+  }
+
   //box to store tasks
   final _tasksBox = Hive.box('myTasks');
 
   final formKey = GlobalKey<FormState>();
   TextEditingController date_controller = TextEditingController();
-  TextEditingController taskName_controller = TextEditingController();
 
   // default selected priority
   int prioritySelected = 0;
@@ -113,13 +121,11 @@ class _EditPageState extends State<EditPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextFormField(
-                        controller: TextEditingController(
-                            text: widget.initialTask['taskName']),
+                        controller: taskName_controller,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Enter Task';
                           } else {
-                            taskName_controller.text = value;
                             return null;
                           }
                         },
@@ -145,7 +151,6 @@ class _EditPageState extends State<EditPage> {
                         ),
                       ),
                       TextFormField(
-                        // initialValue: widget.initialTask['date'],
                           controller: date_controller.text != ''? date_controller 
                            :TextEditingController(text: 
                            widget.initialTask['date']),
