@@ -1,3 +1,4 @@
+import 'package:basic/pages/edit_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -49,8 +50,7 @@ class _HomePageState extends State<HomePage> {
     var item = _tasksBox.get(id);
     item['completedStatus'] = !item['completedStatus'];
 
-    _tasksBox.putAt(id, item);
-
+    _tasksBox.put(id, item);
     refreshTasks();
   }
 
@@ -58,6 +58,15 @@ class _HomePageState extends State<HomePage> {
     _tasksBox.delete(id);
 
     refreshTasks();
+  }
+
+  void editTask(id) {
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => EditPage(taskId: id, initialTask: _tasksBox.get(id)),
+      ),
+    );
   }
 
   @override
@@ -131,6 +140,7 @@ class _HomePageState extends State<HomePage> {
                                 },
                               ),
                               PopupMenuItem(
+                                value: 'edit',
                                 child: Text(
                                   'Edit',
                                   style: TextStyle(
@@ -138,11 +148,13 @@ class _HomePageState extends State<HomePage> {
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                onTap: () {
-                                  // editTask(item['id']);
-                                },
                               ),
                             ],
+                            onSelected: (value) {
+                              if (value == 'edit'){
+                                editTask(item['id']);
+                              }
+                            },
                           ),
                           Expanded(
                             child: Column(
