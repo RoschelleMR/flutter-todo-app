@@ -51,29 +51,31 @@ class _HomePageState extends State<HomePage> {
         });
       }
 
-      if (currentIndex == 1 && item['completedStatus'] == false) {
+      if (currentIndex == 1){
         newHeader = 'Incomplete Tasks';
-
-        tasks_list.add({
-          'id': taskKeys[i],
-          'name': item['taskName'],
-          'date': item['date'],
-          'priorityColor': item['priorityColor'],
-          'category': item['category'],
-          'completedStatus': item['completedStatus'],
-        });
+        if(item['completedStatus'] == false){
+          tasks_list.add({
+            'id': taskKeys[i],
+            'name': item['taskName'],
+            'date': item['date'],
+            'priorityColor': item['priorityColor'],
+            'category': item['category'],
+            'completedStatus': item['completedStatus'],
+          });
+        }
       }
-      if (currentIndex == 2 && item['completedStatus'] == true) {
+      if (currentIndex == 2){
         newHeader = 'Completed Tasks';
-
-        tasks_list.add({
-          'id': taskKeys[i],
-          'name': item['taskName'],
-          'date': item['date'],
-          'priorityColor': item['priorityColor'],
-          'category': item['category'],
-          'completedStatus': item['completedStatus'],
-        });
+        if(item['completedStatus'] == true){
+          tasks_list.add({
+            'id': taskKeys[i],
+            'name': item['taskName'],
+            'date': item['date'],
+            'priorityColor': item['priorityColor'],
+            'category': item['category'],
+            'completedStatus': item['completedStatus'],
+          });
+        }
       }
     }
 
@@ -93,6 +95,20 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> deleteTask(id) async {
     _tasksBox.delete(id);
+
+    refreshTasks();
+  }
+
+  Future<void> clearTasks() async {
+    List taskKeys = _tasksBox.keys.toList();
+
+    for (var i = 0; i < taskKeys.length; i++) {
+      final item = _tasksBox.get(taskKeys[i]);
+
+      if (currentIndex == 2 && item['completedStatus'] == true) {
+        _tasksBox.delete(taskKeys[i]);
+      }
+    }
 
     refreshTasks();
   }
@@ -156,11 +172,11 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       backgroundColor: Color(0xff242424),
-      floatingActionButtonLocation: currentIndex == 2
+      floatingActionButtonLocation: currentIndex == 2 && tasks_list.length != 0
           ? FloatingActionButtonLocation.miniStartFloat
           : FloatingActionButtonLocation.miniEndFloat,
       floatingActionButton:
-          currentIndex == 2 ? deleteCompleted() : floatingButton(),
+          currentIndex == 2 && tasks_list.length != 0 ? clearCompletedButton() : floatingButton(),
       appBar: appBarSection(),
       body: homeBody(),
       bottomNavigationBar: NavigationBar(
@@ -216,7 +232,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Padding(
                     padding:
-                        const EdgeInsets.only(top: 10, bottom: 10, right: 8),
+                        const EdgeInsets.only(top: 12, bottom: 12, right: 8),
                     child: Row(
                       children: [
                         PopupMenuButton(
@@ -341,22 +357,22 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  deleteCompleted() {
+  clearCompletedButton() {
     return SizedBox(
       height: 45,
       width: 120,
       child: FloatingActionButton(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(6)
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
         backgroundColor: Color(0xff00C969),
         foregroundColor: Colors.white,
-        onPressed: (){},
+        onPressed: () {
+          clearTasks();
+        },
         child: FittedBox(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Delete Tasks',
+              'Clear Tasks',
               style: TextStyle(
                 fontWeight: FontWeight.w800,
                 fontSize: 20,
