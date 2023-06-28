@@ -23,6 +23,19 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Poppins',
         unselectedWidgetColor: Colors.white,
+        navigationBarTheme: NavigationBarThemeData(
+          indicatorShape: null,
+          indicatorColor: Colors.transparent,
+          labelTextStyle: MaterialStateProperty.resolveWith((state) {
+            if (state.contains(MaterialState.selected)) {
+              return const TextStyle(
+                color: Color(0xff00C969),
+                fontWeight: FontWeight.w500,
+              );
+            }
+            return const TextStyle(color: Colors.white);
+          }),
+        ),
       ),
       home: HomePage(),
     );

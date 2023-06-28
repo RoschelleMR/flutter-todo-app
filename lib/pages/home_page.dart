@@ -17,6 +17,8 @@ class _HomePageState extends State<HomePage> {
 
   bool dataEmpty = true;
   List<Map<String, dynamic>> tasks_list = [];
+  int currentIndex = 0;
+  String headerText = 'All Tasks';
 
   @override
   void initState() {
@@ -28,21 +30,56 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void refreshTasks() {
-    final data = _tasksBox.keys.map((key) {
-      final item = _tasksBox.get(key);
-      return {
-        'id': key,
-        'name': item['taskName'],
-        'date': item['date'],
-        'priorityColor': item['priorityColor'],
-        'category': item['category'],
-        'completedStatus': item['completedStatus'],
-      };
-    }).toList();
+  Future<void> refreshTasks() async {
+    List taskKeys = _tasksBox.keys.toList();
+    String newHeader = '';
+    tasks_list.clear();
+
+    for (var i = 0; i < taskKeys.length; i++) {
+      final item = _tasksBox.get(taskKeys[i]);
+
+      if (currentIndex == 0) {
+        newHeader = 'All Tasks';
+
+        tasks_list.add({
+          'id': taskKeys[i],
+          'name': item['taskName'],
+          'date': item['date'],
+          'priorityColor': item['priorityColor'],
+          'category': item['category'],
+          'completedStatus': item['completedStatus'],
+        });
+      }
+
+      if (currentIndex == 1 && item['completedStatus'] == false) {
+        newHeader = 'Incomplete Tasks';
+
+        tasks_list.add({
+          'id': taskKeys[i],
+          'name': item['taskName'],
+          'date': item['date'],
+          'priorityColor': item['priorityColor'],
+          'category': item['category'],
+          'completedStatus': item['completedStatus'],
+        });
+      }
+      if (currentIndex == 2 && item['completedStatus'] == true) {
+        newHeader = 'Completed Tasks';
+
+        tasks_list.add({
+          'id': taskKeys[i],
+          'name': item['taskName'],
+          'date': item['date'],
+          'priorityColor': item['priorityColor'],
+          'category': item['category'],
+          'completedStatus': item['completedStatus'],
+        });
+      }
+    }
 
     setState(() {
-      tasks_list = data.reversed.toList();
+      headerText = newHeader;
+      tasks_list = tasks_list.reversed.toList();
     });
   }
 
@@ -61,12 +98,56 @@ class _HomePageState extends State<HomePage> {
   }
 
   void editTask(id) {
-
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (BuildContext context) => EditPage(taskId: id, initialTask: _tasksBox.get(id)),
+        builder: (BuildContext context) =>
+            EditPage(taskId: id, initialTask: _tasksBox.get(id)),
       ),
     );
+  }
+
+  List<Widget> navigationDestinations() {
+    return <Widget>[
+      NavigationDestination(
+        selectedIcon: SvgPicture.asset(
+          'assets/icons/list-check-solid.svg',
+          color: Color(0xff00C969),
+          width: 26,
+        ),
+        icon: SvgPicture.asset(
+          'assets/icons/list-check-solid.svg',
+          color: Colors.white,
+          width: 26,
+        ),
+        label: 'Home',
+      ),
+      NavigationDestination(
+        selectedIcon: SvgPicture.asset(
+          'assets/icons/circle-xmark-solid.svg',
+          color: Color(0xff00C969),
+          width: 26,
+        ),
+        icon: SvgPicture.asset(
+          'assets/icons/circle-xmark-solid.svg',
+          color: Colors.white,
+          width: 26,
+        ),
+        label: 'Incomplete',
+      ),
+      NavigationDestination(
+        selectedIcon: SvgPicture.asset(
+          'assets/icons/check-solid.svg',
+          color: Color(0xff00C969),
+          width: 26,
+        ),
+        icon: SvgPicture.asset(
+          'assets/icons/check-solid.svg',
+          color: Colors.white,
+          width: 26,
+        ),
+        label: 'Completed',
+      ),
+    ];
   }
 
   @override
@@ -75,149 +156,171 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       backgroundColor: Color(0xff242424),
-      floatingActionButton: floatingButton(),
+      floatingActionButtonLocation: currentIndex == 2
+          ? FloatingActionButtonLocation.miniStartFloat
+          : FloatingActionButtonLocation.miniEndFloat,
+      floatingActionButton:
+          currentIndex == 2 ? deleteCompleted() : floatingButton(),
       appBar: appBarSection(),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0, left: 12, bottom: 12),
-                child: Text(
-                  'All Tasks',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF888888).withOpacity(0.2)),
-                ),
-              ),
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                separatorBuilder: (context, index) => SizedBox(
-                  height: 10,
-                ),
-                itemCount: tasks_list.length,
-                itemBuilder: (context, index) {
-                  final item = tasks_list[index];
+      body: homeBody(),
+      bottomNavigationBar: NavigationBar(
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        backgroundColor: Color.fromRGBO(24, 24, 24, 0.884),
+        elevation: 0,
+        destinations: navigationDestinations(),
+        selectedIndex: currentIndex,
+        onDestinationSelected: (int index) {
+          setState(() {
+            currentIndex = index;
+            refreshTasks();
+          });
+        },
+      ),
+    );
+  }
 
-                  return Container(
-                    margin: EdgeInsets.all(5),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(20, 20, 20, 0.83),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(top: 10, bottom: 10, right: 8),
-                      child: Row(
-                        children: [
-                          PopupMenuButton(
-                            iconSize: 32,
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(8.0),
-                                bottomRight: Radius.circular(8.0),
-                                topLeft: Radius.circular(8.0),
-                                topRight: Radius.circular(8.0),
+  SingleChildScrollView homeBody() {
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(bottom: 50, top: 8, left: 5, right: 5),
+      scrollDirection: Axis.vertical,
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0, left: 12, bottom: 12),
+              child: Text(
+                headerText,
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF888888).withOpacity(0.2)),
+              ),
+            ),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              separatorBuilder: (context, index) => SizedBox(
+                height: 10,
+              ),
+              itemCount: tasks_list.length,
+              itemBuilder: (context, index) {
+                final item = tasks_list[index];
+
+                return Container(
+                  margin: EdgeInsets.all(5),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(20, 20, 20, 0.83),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.only(top: 10, bottom: 10, right: 8),
+                    child: Row(
+                      children: [
+                        PopupMenuButton(
+                          iconSize: 32,
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(8.0),
+                              bottomRight: Radius.circular(8.0),
+                              topLeft: Radius.circular(8.0),
+                              topRight: Radius.circular(8.0),
+                            ),
+                          ),
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              child: Text(
+                                'Delete',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              onTap: () {
+                                deleteTask(item['id']);
+                              },
+                            ),
+                            PopupMenuItem(
+                              value: 'edit',
+                              child: Text(
+                                'Edit',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                child: Text(
-                                  'Delete',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                          ],
+                          onSelected: (value) {
+                            if (value == 'edit') {
+                              editTask(item['id']);
+                            }
+                          },
+                        ),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item['name'],
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                onTap: () {
-                                  deleteTask(item['id']);
-                                },
                               ),
-                              PopupMenuItem(
-                                value: 'edit',
-                                child: Text(
-                                  'Edit',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w500,
+                              Text(
+                                item['date'],
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color.fromRGBO(0, 201, 104, 0.981),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Color(item['priorityColor']),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 2.0, bottom: 2, right: 5, left: 5),
+                                  child: Text(
+                                    item['category'],
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                               ),
                             ],
-                            onSelected: (value) {
-                              if (value == 'edit'){
-                                editTask(item['id']);
-                              }
-                            },
                           ),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item['name'],
-                                  style: TextStyle(
-                                    fontSize: 21,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Text(
-                                  item['date'],
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Color.fromRGBO(0, 201, 104, 0.981),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Color(item['priorityColor']),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 2.0, bottom: 2, right: 5, left: 5),
-                                    child: Text(
-                                      item['category'],
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Checkbox(
-                            checkColor: Colors.white,
-                            activeColor: Color(0xff00C969),
-                            value: item['completedStatus'],
-                            onChanged: (value) {
-                              updateStatus(item['id']);
-                            },
-                          ),
-                        ],
-                      ),
+                        ),
+                        Checkbox(
+                          checkColor: Colors.white,
+                          activeColor: Color(0xff00C969),
+                          value: item['completedStatus'],
+                          onChanged: (value) {
+                            updateStatus(item['id']);
+                          },
+                        ),
+                      ],
                     ),
-                  );
-                },
-                //this is temporary, need to add an intro to the app
-                // that says 'Create a task' or something like that
-              ),
-            ]),
-      ),
+                  ),
+                );
+              },
+              //this is temporary, need to add an intro to the app
+              // that says 'Create a task' or something like that
+            ),
+          ]),
     );
   }
 
@@ -235,6 +338,33 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       backgroundColor: Color(0xff00C969),
+    );
+  }
+
+  deleteCompleted() {
+    return SizedBox(
+      height: 45,
+      width: 120,
+      child: FloatingActionButton(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(6)
+        ),
+        backgroundColor: Color(0xff00C969),
+        foregroundColor: Colors.white,
+        onPressed: (){},
+        child: FittedBox(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Delete Tasks',
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 20,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
