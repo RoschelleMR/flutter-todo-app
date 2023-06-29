@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    if (tasks_list.length == 0) {
+    if (_tasksBox.isEmpty) {
       dataEmpty = true;
     } else {
       dataEmpty = false;
@@ -35,12 +35,24 @@ class _HomePageState extends State<HomePage> {
     String newHeader = '';
     tasks_list.clear();
 
+    if (currentIndex == 0) {
+      newHeader = 'All Tasks';
+    }
+    ;
+    if (currentIndex == 1) {
+      newHeader = 'Incomplete Tasks';
+    }
+    ;
+
+    if (currentIndex == 2) {
+      newHeader = 'Completed Tasks';
+    }
+    ;
+
     for (var i = 0; i < taskKeys.length; i++) {
       final item = _tasksBox.get(taskKeys[i]);
 
       if (currentIndex == 0) {
-        newHeader = 'All Tasks';
-
         tasks_list.add({
           'id': taskKeys[i],
           'name': item['taskName'],
@@ -51,9 +63,8 @@ class _HomePageState extends State<HomePage> {
         });
       }
 
-      if (currentIndex == 1){
-        newHeader = 'Incomplete Tasks';
-        if(item['completedStatus'] == false){
+      if (currentIndex == 1) {
+        if (item['completedStatus'] == false) {
           tasks_list.add({
             'id': taskKeys[i],
             'name': item['taskName'],
@@ -64,9 +75,8 @@ class _HomePageState extends State<HomePage> {
           });
         }
       }
-      if (currentIndex == 2){
-        newHeader = 'Completed Tasks';
-        if(item['completedStatus'] == true){
+      if (currentIndex == 2) {
+        if (item['completedStatus'] == true) {
           tasks_list.add({
             'id': taskKeys[i],
             'name': item['taskName'],
@@ -175,13 +185,14 @@ class _HomePageState extends State<HomePage> {
       floatingActionButtonLocation: currentIndex == 2 && tasks_list.length != 0
           ? FloatingActionButtonLocation.miniStartFloat
           : FloatingActionButtonLocation.miniEndFloat,
-      floatingActionButton:
-          currentIndex == 2 && tasks_list.length != 0 ? clearCompletedButton() : floatingButton(),
+      floatingActionButton: currentIndex == 2 && tasks_list.length != 0
+          ? clearCompletedButton()
+          : floatingButton(),
       appBar: appBarSection(),
-      body: homeBody(),
+      body: _tasksBox.isEmpty ? welcomeBody() : homeBody(),
       bottomNavigationBar: NavigationBar(
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        backgroundColor: Color.fromRGBO(24, 24, 24, 0.884),
+        backgroundColor: Color(0xE0181818),
         elevation: 0,
         destinations: navigationDestinations(),
         selectedIndex: currentIndex,
@@ -192,6 +203,32 @@ class _HomePageState extends State<HomePage> {
           });
         },
       ),
+    );
+  }
+
+  Column welcomeBody() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Center(
+          child: SvgPicture.asset(
+            'assets/icons/tasks-list.svg',
+            width: 280,
+          ),
+        ),
+        SizedBox(
+          height: 35,
+        ),
+        Text(
+          'Add Some Tasks',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF888888).withOpacity(0.2),
+          ),
+        )
+      ],
     );
   }
 
@@ -333,8 +370,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               },
-              //this is temporary, need to add an intro to the app
-              // that says 'Create a task' or something like that
             ),
           ]),
     );
@@ -343,13 +378,13 @@ class _HomePageState extends State<HomePage> {
   AppBar appBarSection() {
     return AppBar(
       elevation: 0,
-      toolbarHeight: 75,
+      toolbarHeight: 70,
       centerTitle: true,
       automaticallyImplyLeading: false,
       title: Text(
         'TaskPal',
         style: TextStyle(
-          fontSize: 24,
+          fontSize: 28,
           fontWeight: FontWeight.bold,
         ),
       ),
