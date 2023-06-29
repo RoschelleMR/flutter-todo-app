@@ -20,15 +20,6 @@ class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
   String headerText = 'All Tasks';
 
-  @override
-  void initState() {
-    super.initState();
-    if (_tasksBox.isEmpty) {
-      dataEmpty = true;
-    } else {
-      dataEmpty = false;
-    }
-  }
 
   Future<void> refreshTasks() async {
     List taskKeys = _tasksBox.keys.toList();
